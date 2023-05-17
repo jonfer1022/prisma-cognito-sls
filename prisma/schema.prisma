@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model userStatus {
+  id         String   @id @default(uuid())
+  name       String   @db.VarChar(250)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  users      users[]
+}
+
+model users {
+  id             String       @id @default(uuid())
+  phone          String       @db.VarChar(250)
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+  otpHistory     otpHistory[]
+  user_status    userStatus   @relation(fields: [user_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_status_id String
+}
+
+model otpHistory {
+  id         String   @id @default(uuid())
+  code       String?  @db.VarChar(20)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user       users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_id    String
+}
