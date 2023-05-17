@@ -10,5 +10,4 @@ jspm_packages
 .env
 
 prisma/migrations
-
 src/generated
