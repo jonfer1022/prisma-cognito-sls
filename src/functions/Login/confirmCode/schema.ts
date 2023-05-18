@@ -3,6 +3,7 @@ export default {
   properties: {
     phone: { type: "string" },
     code: { type: "string" },
+    password: { type: "string" },
   },
-  required: ["phone", "code"],
+  required: ["phone", "code", "password"],
 } as const;

@@ -2,21 +2,21 @@ import { CognitoAdapter, SNSAdapter } from "../adapters/aws-adapters";
 import {
   OTPAdapter,
   UserAdapter,
-  UserStatusAdapter,
+  // UserStatusAdapter,
 } from "../adapters/database-adapters";
 import { NotFoundProblem } from "../entities/errors";
 import * as crypto from "crypto-secure-random-digit";
 
 export class LoginService {
   private userAdapter: UserAdapter;
-  private userStatusAdapter: UserStatusAdapter;
+  // private userStatusAdapter: UserStatusAdapter;
   private snsAdapter: SNSAdapter;
   private otpAdapter: OTPAdapter;
   private cognitoAdapter: CognitoAdapter;
 
   constructor() {
     this.userAdapter = new UserAdapter();
-    this.userStatusAdapter = new UserStatusAdapter();
+    // this.userStatusAdapter = new UserStatusAdapter();
     this.snsAdapter = new SNSAdapter();
     this.otpAdapter = new OTPAdapter();
     this.cognitoAdapter = new CognitoAdapter();
@@ -30,10 +30,7 @@ export class LoginService {
   public async signUp(phone: string, password: string) {
     try {
       await this.cognitoAdapter.signUpUser(phone, password);
-      const status = await this.userStatusAdapter.getUserStatusByName(
-        "signed_up"
-      );
-      await this.userAdapter.createUser(phone, status.id);
+      await this.userAdapter.createUser(phone);
     } catch (error) {
       console.log(`Error in signUp: ${error}`);
       return error;
@@ -49,12 +46,7 @@ export class LoginService {
     try {
       const user = await this.userAdapter.getUserByPhone(phone);
       if (!user) throw new NotFoundProblem();
-
       await this.cognitoAdapter.confirmSignUp(phone, code);
-      const status = await this.userStatusAdapter.getUserStatusByName(
-        "sign_up_confirmed"
-      );
-      await this.userAdapter.updateUser({ user_status_id: status.id }, user.id);
     } catch (error) {
       console.log(`Error in confirmSignUp: ${error}`);
       return error;
@@ -100,18 +92,19 @@ export class LoginService {
    * verifyCodeToForgotPassword
    * @param {string} phone users phone
    * @param {string} code sms code
+   * @param {string} password new password
    */
-  public async verifyCodeToForgotPassword(phone: string, code: string) {
+  public async verifyCodeToForgotPassword(
+    phone: string,
+    code: string,
+    password: string
+  ) {
     try {
       const user = await this.userAdapter.getUserByPhone(phone);
       if (!user) throw new NotFoundProblem();
 
-      await this.checkCode(user.id, code);
-      const status = await this.userStatusAdapter.getUserStatusByName(
-        "allowed_change_password"
-      );
-
-      await this.userAdapter.updateUser({ user_status_id: status.id }, user.id);
+      await this.cognitoAdapter.confirmNewPassword(phone, password, code);
+      await this.signIn(phone, password);
 
       return { ok: "ok" };
     } catch (error) {
@@ -139,30 +132,15 @@ export class LoginService {
   /**
    * setPassword
    * @param {string} phone users phone
-   * @param {string} password new users password
    */
-  public async forgotPassword(phone: string, password: string) {
+  public async forgotPassword(phone: string) {
     try {
       const user = await this.userAdapter.getUserByPhone(phone);
       if (!user) throw new NotFoundProblem();
 
-      const status = await this.userStatusAdapter.getUserStatusById(
-        user.user_status_id
-      );
-
-      if (status.name != "allowed_change_password") throw new NotFoundProblem();
-      await this.cognitoAdapter.setPasswordToUser(phone, password);
-
-      const statusConfirmed = await this.userStatusAdapter.getUserStatusByName(
-        "sign_up_confirmed"
-      );
-
-      await this.userAdapter.updateUser(
-        { user_status_id: statusConfirmed.id },
-        user.id
-      );
+      await this.cognitoAdapter.forgotPassword(phone);
     } catch (error) {
-      console.log(`Error in setPassword: ${error}`);
+      console.log(`Error in forgotPassword: ${error}`);
       return error;
     }
   }

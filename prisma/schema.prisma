@@ -22,8 +22,8 @@ model users {
   created_at     DateTime     @default(now())
   updated_at     DateTime     @updatedAt
   otpHistory     otpHistory[]
-  user_status    userStatus   @relation(fields: [user_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_status_id String
+  userStatus     userStatus?  @relation(fields: [user_status_id], references: [id])
+  user_status_id String?
 }
 
 model otpHistory {

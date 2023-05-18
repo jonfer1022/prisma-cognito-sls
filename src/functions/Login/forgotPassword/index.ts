@@ -9,7 +9,7 @@ export default {
     {
       http: {
         method: "post",
-        path: "set-password",
+        path: "forgot-password",
         cors: {
           origin: "*",
         },

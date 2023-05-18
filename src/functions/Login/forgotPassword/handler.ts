@@ -10,10 +10,7 @@ const forgotPassword: ValidatedEventAPIGatewayProxyEvent<
   typeof schema
 > = async (event): Promise<APIGatewayProxyResult> => {
   const loginService = new LoginService();
-  const result = await loginService.forgotPassword(
-    event.body.phone,
-    event.body.password
-  );
+  const result = await loginService.forgotPassword(event.body.phone);
   return formatJSONResponse(result);
 };
 

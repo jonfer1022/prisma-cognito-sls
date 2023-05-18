@@ -21,7 +21,7 @@ export class UserAdapter {
 
   public async createUser(
     phone: string,
-    user_status_id: string
+    user_status_id?: string
   ): Promise<users> {
     try {
       await this.client.users.create({

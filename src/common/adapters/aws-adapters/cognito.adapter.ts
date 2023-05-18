@@ -60,12 +60,12 @@ export class CognitoAdapter {
 
       return true;
     } catch (error) {
-      console.log(error);
-      return false;
+      console.log(`Error in signInUser: ${error}`);
+      return error;
     }
   }
 
-  public async confirmSignUp(username: string, code: string): Promise<boolean> {
+  public async confirmSignUp(username: string, code: string) {
     const params = {
       ClientId: this.clientId,
       ConfirmationCode: code,
@@ -74,21 +74,14 @@ export class CognitoAdapter {
     };
 
     try {
-      const cognitoResp = await this.cognitoIdentity
-        .confirmSignUp(params)
-        .promise();
-      console.log(
-        "-----> ~ Cognito ~ confirmSignUp ~ cognitoResp:",
-        cognitoResp
-      );
-      return true;
+      await this.cognitoIdentity.confirmSignUp(params).promise();
     } catch (error) {
       console.log(`Error in confirmSignUp: ${error}`);
-      return false;
+      return error;
     }
   }
 
-  public async forgotPassword(username): Promise<boolean> {
+  public async forgotPassword(username: string) {
     var params = {
       ClientId: this.clientId /* required */,
       Username: username /* required */,
@@ -96,12 +89,10 @@ export class CognitoAdapter {
     };
 
     try {
-      const data = await this.cognitoIdentity.forgotPassword(params).promise();
-      console.log(data);
-      return true;
+      await this.cognitoIdentity.forgotPassword(params).promise();
     } catch (error) {
-      console.log(error);
-      return false;
+      console.log(`Error in forgotPassword: ${error}`);
+      return error;
     }
   }
 
@@ -117,16 +108,12 @@ export class CognitoAdapter {
       Username: username /* required */,
       SecretHash: this.hashSecret(username),
     };
-
     try {
-      const data = await this.cognitoIdentity
-        .confirmForgotPassword(params)
-        .promise();
-      console.log(data);
+      await this.cognitoIdentity.confirmForgotPassword(params).promise();
       return true;
     } catch (error) {
-      console.log(error);
-      return false;
+      console.log(`Error in confirmNewPassword: ${error}`);
+      return error;
     }
   }
 
@@ -145,8 +132,8 @@ export class CognitoAdapter {
       await this.cognitoIdentity.adminSetUserPassword(params).promise();
       return true;
     } catch (error) {
-      console.log(error);
-      return false;
+      console.log(`Error in setPasswordToUser: ${error}`);
+      return error;
     }
   }
 

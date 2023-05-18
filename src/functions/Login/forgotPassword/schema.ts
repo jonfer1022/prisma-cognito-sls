@@ -4,5 +4,5 @@ export default {
     phone: { type: "string" },
     password: { type: "string" },
   },
-  required: ["phone", "password"],
+  required: ["phone"],
 } as const;

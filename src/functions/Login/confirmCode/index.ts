@@ -9,7 +9,7 @@ export default {
     {
       http: {
         method: "post",
-        path: "verify-code-to-forgot-password",
+        path: "confirm-code",
         cors: {
           origin: "*",
         },

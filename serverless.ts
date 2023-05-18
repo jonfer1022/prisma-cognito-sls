@@ -1,13 +1,11 @@
 import type { AWS } from "@serverless/typescript";
 import {
-  hello,
-  requestCode,
-  verifyCodeToForgotPassword,
   signUp,
   confirmSignUp,
   signIn,
   forgotPassword,
-} from "@functions/index";
+  confirmCode,
+} from "@functions/Login";
 
 const serverlessConfiguration: AWS = {
   service: "prisma-sls",
@@ -27,9 +25,7 @@ const serverlessConfiguration: AWS = {
   },
   // import the function via paths
   functions: {
-    hello,
-    requestCode,
-    verifyCodeToForgotPassword,
+    confirmCode,
     signUp,
     confirmSignUp,
     signIn,
